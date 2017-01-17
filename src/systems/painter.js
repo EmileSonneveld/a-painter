@@ -81,11 +81,11 @@ AFRAME.registerSystem('painter', {
         // Undo (Backspace)
         self.brushSystem.undo();
       }
-      if (event.keyCode === 67) {
+      else if (event.keyCode === 67) {
         // Clear (c)
         self.brushSystem.clear();
       }
-      if (event.keyCode === 78) {
+      else if (event.keyCode === 78) {
         // Next brush (n)
         var hands = document.querySelectorAll('[paint-controls]');
         var brushesNames = Object.keys(AFRAME.BRUSHES);
@@ -95,24 +95,27 @@ AFRAME.registerSystem('painter', {
           hand.setAttribute('brush', 'brush', brushesNames[index]);
         });
       }
-      if (event.keyCode === 82) {
+      else if (event.keyCode === 82) {
         // Random stroke (r)
         self.brushSystem.generateRandomStrokes(1);
       }
-      if (event.keyCode === 76) {
+      else if (event.keyCode === 76) {
         // load binary from file (l)
         self.brushSystem.loadFromUrl('demo.apa', true);
       }
-      if (event.keyCode === 85) { // u - upload
+      else if (event.keyCode === 85) { // u - upload
         self.upload();
       }
-      if (event.keyCode === 86) { // v - save
+      else if (event.keyCode === 86) { // v - save
         self.save();
       }
-      if (event.keyCode === 74) { // j - save json
+      else if (event.keyCode === 74) { // j - save json
         self.saveJSON();
       }
-      if (event.keyCode === 79) { // o - toggle template objects+images visibility
+      else if (event.keyCode === 68) { // d - save DAE
+        self.saveDAE();
+      }
+      else if (event.keyCode === 79) { // o - toggle template objects+images visibility
         self.showTemplateItems = !self.showTemplateItems;
         var templateItems = document.querySelectorAll('.templateitem');
         for (var i = 0; i < templateItems.length; i++) {
@@ -127,6 +130,12 @@ AFRAME.registerSystem('painter', {
     var json = this.brushSystem.getJSON();
     var blob = new Blob([JSON.stringify(json)], {type: 'application/json'});
     saveAs(blob, 'demo.json');
+  },
+  saveDAE: function () {
+    var exp = new THREE.DAESceneExporter();
+    var str = exp.parse(document.querySelector('a-scene').object3D);
+    var blob = new Blob([str], {type: 'text/plain'});
+    saveAs(blob, 'demo.dae');
   },
   save: function () {
     var dataviews = this.brushSystem.getBinary();
