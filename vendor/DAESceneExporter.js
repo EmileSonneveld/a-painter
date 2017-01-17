@@ -944,6 +944,7 @@ THREE.DAESceneExporter.prototype = {
 		// count the number of lines, triangles and polygon meshes
 		var countLines = 0;
 		var countPoly = 0;
+		var trianglestrip = false;
 
 		var mesh_faces = mesh.faces;
 		if(!mesh_faces){
@@ -968,13 +969,30 @@ THREE.DAESceneExporter.prototype = {
 					});
 				}
 			}else{
+				//trianglestrip = true;  // Not supported by 3ds max
+
+				for (var i = 0, l = mesh.attributes.position.count-3; i < l; i += 1 ) 
+				{
+					//if(i%2==0){
+						mesh_faces.push({
+							mNumIndices : 3,
+							mIndices: [i, i + 2 i + 1]
+						});
+					//} else {
+						mesh_faces.push({
+							mNumIndices : 3,
+							mIndices: [i, i + 1 i + 2]
+						});
+					//}
+				}
+				/*// Trianlge list
 				for (var i = 0, l = mesh.attributes.position.count; i < l; i += 3 ) 
 				{
 					mesh_faces.push({
 						mNumIndices : 3,
 						mIndices: [i, i + 1, i + 2]
 					});
-				}
+				}*/
 			}
 		}
 
@@ -1037,6 +1055,25 @@ THREE.DAESceneExporter.prototype = {
 			this.mOutput += "</p>" + this.endstr;
 			this.PopTag();
 			this.mOutput += this.startstr + "</polylist>" + this.endstr;
+		}
+
+		if(trianglestrip === true) // Not supported by 3ds max
+		{
+			this.mOutput += this.startstr + "<tristrips  count=\"" + mesh.attributes.position.count + "\" material=\"defaultMaterial\">" + this.endstr;
+			this.PushTag();
+			this.mOutput += this.startstr + "<input offset=\"0\" semantic=\"VERTEX\" source=\"#" + idstrEscaped + "-vertices\" />" + this.endstr;
+
+			this.mOutput += this.startstr + "<p>";
+			for (var i = 0, l = mesh.attributes.position.count; i < l; i += 1 ) 
+			{
+				//var face = mesh_faces[a];
+				//if (face.mNumIndices < 3) continue;
+				//for( var b = 0; b < face.mNumIndices; ++b )
+				this.mOutput += i + " ";
+			}
+			this.mOutput += "</p>" + this.endstr;
+			this.PopTag();
+			this.mOutput += this.startstr + "</tristrips >" + this.endstr;
 		}
 
 		// closing tags
